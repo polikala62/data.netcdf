@@ -15,7 +15,7 @@ def netcdf_to_singleband_raster(in_ncdf, in_var, x_var, y_var, x_dim, y_dim, out
     arcpy.env.overwriteOutput = True
     
     # Create dataset.
-    dataset = nc.Dataset(in_ncdf, "r", format="NETCDF4")
+    dataset = nc.Dataset(in_ncdf, "r", format="NETCDF4") #@UndefinedVariableFromImport
     
     # Get rid of masked values (!!!)
     dataset.set_auto_mask(preserve_masked_vals)

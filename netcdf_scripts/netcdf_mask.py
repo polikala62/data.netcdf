@@ -158,7 +158,23 @@ def netcdf_mask(in_extent_fc, xy_spacing, path_dict, mask_dict, in_datetime, out
     print("Script finished!")
 
 #------------------------------------------------------------------------------ 
- 
+'''
+in_netcdf_dict = {r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2012.nc',
+'surface':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2013.nc',
+'surface':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2014.nc',
+'surface':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2015.nc',
+'surface':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2016.nc',
+'surface':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2017.nc',
+'surface':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_zos_2018.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2012.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2013.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2014.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2015.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2016.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2017.nc',
+'water':r'D:\GIS\Maritime_Encounters\NetCDF\current\current_uv_2018.nc',
+}
+'''
 netcdf_mask(r"C:\GIS\Maritime_Encounters\Copernicus_Testing\Download_Test\Features\DEM_footprint_WGS84.shp", 
             50000, 
             {'surface':"C:\\GIS\\Maritime_Encounters\\OrmeSim\\NetCDF\\Orme_Surface_2018_01_01.nc",'water':"C:\\GIS\\Maritime_Encounters\\OrmeSim\\NetCDF\\Orme_Water_2018_01_01.nc",'wind_dir':"C:\\GIS\\Maritime_Encounters\\Copernicus_Testing\\Download_Test\\Download\\adaptor.mars.external-1715692160.536764-3213-16-1487bebf-9495-410f-8dba-2e88baf99de9.nc",'wind_speed':"C:\\GIS\\Maritime_Encounters\\Copernicus_Testing\\Download_Test\\Download\\adaptor.mars.external-1715699429.4551916-471-14-75aa5f3d-f211-47b2-8e50-5a18552bb944.nc"}, 
