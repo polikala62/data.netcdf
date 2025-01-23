@@ -7,6 +7,63 @@ import arcpy
 import netCDF4 as nc
 import numpy as np
 
+from netcdf_scripts import numpy_array
+
+def netcdf_to_singleband_raster2(netcdf, x_var, y_var, slice_dict, val_array, out_raster_path, out_crs, x_dim='', y_dim=''):
+    
+    # Set arcpy environments.
+    arcpy.env.outputCoordinateSystem = out_crs
+    arcpy.env.overwriteOutput = True
+    
+    # Set x and y dimensions to the same as the variables (they usually are), unless values have been supplied.
+    if x_dim == '':
+        x_dim = x_var
+    if y_dim == '':
+        y_dim = y_var
+    
+    # Generate arrays for x and y variables.
+    x_array = numpy_array.slice_netcdf(netcdf, x_var, slice_dict)
+    y_array = numpy_array.slice_netcdf(netcdf, y_var, slice_dict)
+    
+    # Flatten x and y arrays.
+    flat_x_array = numpy_array.flatten_slice(netcdf, x_var, x_array, "AVERAGE", [x_dim])
+    flat_y_array = numpy_array.flatten_slice(netcdf, y_var, y_array, "AVERAGE", [y_dim])
+    
+    # Calculate average resolution of raster.
+    x_res = float(abs(np.average(np.diff(flat_x_array))))
+    y_res = float(abs(np.average(np.diff(flat_y_array))))
+    
+    # Check that values in x and y arrays are regular. If they aren't, print a warning (and ignore it).
+    if all(np.diff(flat_x_array)==np.diff(flat_x_array)[0]) == False:
+        print("WARNING: netcdf_to_singleband_raster: values in x variable are not evenly spaced. Using an average spacing of {}.".format(x_res))
+    if all(np.diff(flat_y_array)==np.diff(flat_y_array)[0]) == False:
+        print("WARNING: netcdf_to_singleband_raster: values in y variable are not evenly spaced. Using an average spacing of {}.".format(y_res))
+    
+    # Calculate lower-left corner.
+    sw_corner = arcpy.Point(float(np.nanmin(flat_x_array)), float(np.nanmin(flat_y_array)))
+    
+    # Create list to hold modified value arrays.
+    mod_val_array_list = [val_array]
+    # Check orientation of flattened arrays. If array (0,0) is upper-right corner, then values should be equivalent to min(x) and max(y).
+    if np.nanmin(flat_x_array) != flat_x_array[0]:
+        print("WARNING: netcdf_to_singleband_raster: flipping along vertical axis...")
+        mod_val_array_list.append(np.flipLR(mod_val_array_list[-1]))
+    if np.nanmax(flat_y_array) != flat_y_array[0]:
+        print("WARNING: netcdf_to_singleband_raster: flipping along horizontal axis...")
+        mod_val_array_list.append(np.flipud(mod_val_array_list[-1]))
+        
+    # Replace mask values with arbitrary value.
+    fill_val = 999999
+    mod_val_array_list.append(mod_val_array_list[-1].filled(fill_val))
+    
+    # Replace really high values with None (TODO: CHANGE THIS).
+    mod_val_array_list.append(np.where(mod_val_array_list[-1] < fill_val, mod_val_array_list[-1], fill_val))
+    
+    # Create and save raster.
+    out_ras = arcpy.NumPyArrayToRaster(mod_val_array_list[-1], lower_left_corner=sw_corner, x_cell_size=x_res, y_cell_size=y_res, value_to_nodata=fill_val)
+    out_ras.save(out_raster_path)
+    
+
 def netcdf_to_singleband_raster(in_ncdf, in_var, x_var, y_var, x_dim, y_dim, out_raster, out_crs, 
                                 method="AVERAGE", flip_v=False, flip_h=False, preserve_masked_vals=False):
     
@@ -107,29 +164,12 @@ def netcdf_to_singleband_raster(in_ncdf, in_var, x_var, y_var, x_dim, y_dim, out
     
     out_ras.save(out_raster)
     
-pts = r"C:\GIS\CAA_2024\Test_Data\test_coast_poly.shp"
-out_crs = arcpy.Describe(pts).spatialReference
-out_crs = arcpy.SpatialReference(4326)
-
-netcdf_to_singleband_raster(r'C:\GIS\Maritime_Encounters\OrmeSim\NetCDF\Orme_Surface_2018_01_01.nc',
-                            'zos',
-                            'longitude',
-                            'latitude',
-                            'longitude',
-                            'latitude',
-                            r'C:\GIS\Maritime_Encounters\Copernicus_Testing\Download_Test\Raster\copernicus_r_02.tif',
-                            out_crs,
-                            method="FIRST",
-                            flip_v=True)
-'''
-netcdf_to_singleband_raster(r'C:\GIS\Maritime_Encounters\OrmeSim\Output\full_area_03.nc',
-                            'sub_area',
-                            'easting',
-                            'northing',
-                            'x',
-                            'y',
-                            r'C:\GIS\Maritime_Encounters\Copernicus_Testing\Download_Test\Raster\fullarea03_subarea_first.tif',
-                            out_crs,
-                            method="FIRST",
-                            flip_v=True)
-'''
+#pts = r"C:\GIS\CAA_2024\Test_Data\test_coast_poly.shp"
+#out_crs = arcpy.Describe(pts).spatialReference
+#out_crs = arcpy.SpatialReference(4326)
+#wgs = arcpy.SpatialReference("WGS 1984")
+#in_netcdf = r"C:\GIS\NetCDF_Manipulation\Data\test_echam_spectral.nc"
+#slice_dict = {'time':[0,8], 'mlev':[0,47], 'lat':[0,96], 'lon':[0,192]}
+#pr_slice = numpy_array.slice_netcdf(in_netcdf, 'xl', slice_dict)
+#slice_avg = numpy_array.flatten_slice_by_dict(in_netcdf, 'xl', pr_slice, {'time':"MEAN", 'mlev':"MEAN"})
+#netcdf_to_singleband_raster2(in_netcdf, 'lon', 'lat', slice_dict, slice_avg, r'C:\GIS\NetCDF_Manipulation\Output\test_echam_01.tif', wgs)

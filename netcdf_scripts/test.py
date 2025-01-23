@@ -5,6 +5,7 @@ Created on Mar 21, 2024
 '''
 import netCDF4 as nc
 import numpy as np
+import xarray as xr
 
 def check_netcdf(ncdf_path):
     
@@ -13,7 +14,9 @@ def check_netcdf(ncdf_path):
     variables = rootgrp.variables
     dimensions = rootgrp.dimensions
     
+    print(variables['uo'].dimensions)
     print(variables)
+    
     '''
     sub_area = variables['sub_area']
     print(sub_area.dimensions)
@@ -30,7 +33,7 @@ def check_netcdf(ncdf_path):
     
     #print(variables)
     '''
-check_netcdf(r"C:\GIS\Maritime_Encounters\OrmeSim\NetCDF\wind_dir_2018.nc")
+check_netcdf(r"C:\GIS\NetCDF_Manipulation\Data\20240101_2dh-CMCC--RFVL-MFSeas8-MEDATL-b20240116_an-sv09.00.nc")
 #check_netcdf(r"C:\GIS\Maritime_Encounters\OrmeSim\Output\full_area_03.nc")
 #check_netcdf(r"C:\GIS\Maritime_Encounters\OrmeSim\NetCDF\Orme_Water_2018_01_01.nc")
 #check_netcdf("C:\\GIS\\Maritime_Encounters\\OrmeSim\\Output\\full_area_03.nc")
