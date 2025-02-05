@@ -33,28 +33,42 @@ def netcdf_to_singleband_raster2(netcdf, x_var, y_var, slice_dict, val_array, ou
     x_res = float(abs(np.average(np.diff(flat_x_array))))
     y_res = float(abs(np.average(np.diff(flat_y_array))))
     
+    
+    # KLUDGE
+    y_res=x_res
+    
     # Check that values in x and y arrays are regular. If they aren't, print a warning (and ignore it).
-    if all(np.diff(flat_x_array)==np.diff(flat_x_array)[0]) == False:
+    if (np.diff(flat_x_array)==np.diff(flat_x_array)[0][0]).all() == False:
         print("WARNING: netcdf_to_singleband_raster: values in x variable are not evenly spaced. Using an average spacing of {}.".format(x_res))
-    if all(np.diff(flat_y_array)==np.diff(flat_y_array)[0]) == False:
+    if (np.diff(flat_y_array)==np.diff(flat_y_array)[0][0]).all() == False:
         print("WARNING: netcdf_to_singleband_raster: values in y variable are not evenly spaced. Using an average spacing of {}.".format(y_res))
     
+    # Caluclate extent.
+    x_min = float(np.nanmin(flat_x_array))
+    x_max = float(np.nanmax(flat_x_array))
+    y_min = float(np.nanmin(flat_y_array))
+    y_max = float(np.nanmax(flat_y_array))
+    
+    #arcpy.env.extent = "{} {} {} {}".format(x_min, y_min, x_max, y_max)
+    
     # Calculate lower-left corner.
-    sw_corner = arcpy.Point(float(np.nanmin(flat_x_array)), float(np.nanmin(flat_y_array)))
+    sw_corner = arcpy.Point(x_min, y_min)
     
     # Create list to hold modified value arrays.
     mod_val_array_list = [val_array]
     # Check orientation of flattened arrays. If array (0,0) is upper-right corner, then values should be equivalent to min(x) and max(y).
-    if np.nanmin(flat_x_array) != flat_x_array[0]:
+    if x_min != flat_x_array[0][0]:
         print("WARNING: netcdf_to_singleband_raster: flipping along vertical axis...")
         mod_val_array_list.append(np.flipLR(mod_val_array_list[-1]))
-    if np.nanmax(flat_y_array) != flat_y_array[0]:
+    print(y_max, flat_y_array[0][0])
+    if y_max != flat_y_array[0][0]:
         print("WARNING: netcdf_to_singleband_raster: flipping along horizontal axis...")
         mod_val_array_list.append(np.flipud(mod_val_array_list[-1]))
         
     # Replace mask values with arbitrary value.
     fill_val = 999999
-    mod_val_array_list.append(mod_val_array_list[-1].filled(fill_val))
+    #mod_val_array_list.append(mod_val_array_list[-1].filled(fill_val))
+    mod_val_array_list.append(np.ma.filled(mod_val_array_list[-1], fill_val))
     
     # Replace really high values with None (TODO: CHANGE THIS).
     mod_val_array_list.append(np.where(mod_val_array_list[-1] < fill_val, mod_val_array_list[-1], fill_val))

@@ -14,7 +14,8 @@ def check_netcdf(ncdf_path):
     variables = rootgrp.variables
     dimensions = rootgrp.dimensions
     
-    print(variables['uo'].dimensions)
+    print(dimensions)
+    print()
     print(variables)
     
     '''
@@ -33,7 +34,7 @@ def check_netcdf(ncdf_path):
     
     #print(variables)
     '''
-check_netcdf(r"C:\GIS\NetCDF_Manipulation\Data\20240101_2dh-CMCC--RFVL-MFSeas8-MEDATL-b20240116_an-sv09.00.nc")
+check_netcdf(r"C:\GIS\ArcPro_Projects\Visibility_Testing\Output\med_test_01.nc")
 #check_netcdf(r"C:\GIS\Maritime_Encounters\OrmeSim\Output\full_area_03.nc")
 #check_netcdf(r"C:\GIS\Maritime_Encounters\OrmeSim\NetCDF\Orme_Water_2018_01_01.nc")
 #check_netcdf("C:\\GIS\\Maritime_Encounters\\OrmeSim\\Output\\full_area_03.nc")

@@ -166,7 +166,6 @@ def flatten_slice_by_dict(netcdf, variable, in_slice, flatten_dict):
             
         # Update dim_list.
         dim_list = [i for i in dim_list if i != dim_name]
-        print(dim_list)
         
     return pr_array_list[-1]
     
